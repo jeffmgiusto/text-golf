@@ -21,8 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${jetbrainsMono.className} antialiased`}>
-        <div className="min-h-screen p-4 sm:p-8 overflow-x-auto">
-          <div className="max-w-4xl w-fit mx-auto">
+        <div className="min-h-screen p-2 sm:p-8 overflow-x-hidden">
+          <div className="max-w-4xl w-full mx-auto mobile-scale">
             <Navigation />
             {children}
           </div>

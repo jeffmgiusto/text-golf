@@ -94,7 +94,10 @@ body {
 
 /* Mobile responsive base */
 @media (max-width: 640px) {
-  body {
-    font-size: 12px;
+  .mobile-scale {
+    font-size: clamp(8px, calc(100vw / 44), 12px);
+  }
+  .mobile-scale * {
+    font-size: inherit;
   }
 }
