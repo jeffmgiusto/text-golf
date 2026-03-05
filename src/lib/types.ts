@@ -43,11 +43,19 @@ export interface PlayerWithStats extends Player {
   stats: null;  // SlashGolf doesn't provide strokes gained
 }
 
+// Active tournament entry (for multi-tournament toggle)
+export interface ActiveTournament {
+  tournId: string;
+  name: string;
+  year: string;
+}
+
 // API response from our /api/leaderboard endpoint
 export interface ApiLeaderboardResponse {
   info: TournamentInfo;
   players: PlayerWithStats[];
   courseInfo?: CourseInfo | null;
+  activeTournaments?: ActiveTournament[];
   fetchedAt: string;
   source: 'slashgolf';
   isLive: boolean;

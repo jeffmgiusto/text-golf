@@ -9,7 +9,7 @@ interface LeaderboardProps {
   players: PlayerWithStats[];
 }
 
-type SortColumn = 'pos' | 'player' | 'score' | 'thru';
+type SortColumn = 'pos' | 'player' | 'score' | 'rd' | 'thru';
 type SortDirection = 'asc' | 'desc';
 
 function parsePosition(pos: string): number {
@@ -51,6 +51,12 @@ export function Leaderboard({ players }: LeaderboardProps) {
         case 'score':
           comparison = a.current_score - b.current_score;
           break;
+        case 'rd': {
+          const getRd = (p: PlayerWithStats) =>
+            ([p.R1, p.R2, p.R3, p.R4])[p.round - 1] ?? 999;
+          comparison = getRd(a) - getRd(b);
+          break;
+        }
         case 'thru':
           comparison = parseThru(a.thru) - parseThru(b.thru);
           break;
@@ -112,9 +118,11 @@ export function Leaderboard({ players }: LeaderboardProps) {
           <span className="text-[var(--border)]">│ </span>
           <ColumnHeader column="pos" label="POS" width="w-[4ch]" />
           <span className="text-[var(--border)]"> │ </span>
-          <ColumnHeader column="player" label="PLAYER" width="w-[36ch]" align="left" />
+          <ColumnHeader column="player" label="PLAYER" width="w-[29ch]" align="left" />
           <span className="text-[var(--border)]"> │ </span>
           <ColumnHeader column="score" label="SCORE" width="w-[7ch]" />
+          <span className="text-[var(--border)]"> │ </span>
+          <ColumnHeader column="rd" label="RD" width="w-[4ch]" />
           <span className="text-[var(--border)]"> │ </span>
           <ColumnHeader column="thru" label="THRU" width="w-[6ch]" />
           <span className="text-[var(--border)]"> │</span>

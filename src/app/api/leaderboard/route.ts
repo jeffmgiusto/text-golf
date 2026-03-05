@@ -2,12 +2,15 @@
 // Uses SlashGolf API for all leaderboard data
 // Sub-minute updates during live tournaments!
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { fetchLiveLeaderboard } from '@/lib/slashgolf';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const leaderboard = await fetchLiveLeaderboard();
+    const tournId = request.nextUrl.searchParams.get('tournId') || undefined;
+    const year = request.nextUrl.searchParams.get('year') || undefined;
+
+    const leaderboard = await fetchLiveLeaderboard(tournId, year);
 
     // Use the full CourseInfo (with real par + location) when available (e.g. preview mode),
     // otherwise fall back to constructing from the course name embedded in leaderboard rows.
@@ -21,6 +24,7 @@ export async function GET() {
       info: leaderboard.info,
       players: leaderboard.players,
       courseInfo,
+      activeTournaments: leaderboard.activeTournaments,
       fetchedAt: new Date().toISOString(),
       source: 'slashgolf',
       isLive: leaderboard.isLive,

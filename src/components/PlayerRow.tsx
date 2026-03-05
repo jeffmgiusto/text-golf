@@ -32,10 +32,13 @@ export function PlayerRow({ player, isLast }: PlayerRowProps) {
   const score = formatScore(player.current_score);
   const thru = formatThru(player.thru);
 
-  // Truncate player name (34 chars max, leaving room for expand icon)
-  const displayName = player.player_name.length > 34
-    ? player.player_name.substring(0, 33) + '…'
+  // Truncate player name (27 chars max, leaving room for expand icon)
+  const displayName = player.player_name.length > 27
+    ? player.player_name.substring(0, 26) + '…'
     : player.player_name;
+
+  const rdRaw = ([player.R1, player.R2, player.R3, player.R4])[player.round - 1] ?? null;
+  const rd = rdRaw !== null ? formatScore(rdRaw) : null;
 
   return (
     <>
@@ -49,13 +52,23 @@ export function PlayerRow({ player, isLast }: PlayerRowProps) {
           {String(player.current_pos).padStart(4)}
         </span>
         <span className="text-[var(--border)]"> │ </span>
-        <span className="inline-block w-[36ch] text-left text-[var(--text)]">
-          {isExpanded ? '▼' : '▶'} {displayName.padEnd(34)}
+        <span className="inline-block w-[29ch] text-left text-[var(--text)]">
+          {isExpanded ? '▼' : '▶'} {displayName.padEnd(27)}
         </span>
         <span className="text-[var(--border)]"> │ </span>
         <span className={`inline-block w-[7ch] text-center ${score.colorClass}`}>
           {score.text.padStart(7)}
         </span>
+        <span className="text-[var(--border)]"> │ </span>
+        {rd !== null ? (
+          <span className={`inline-block w-[4ch] text-center ${rd.colorClass}`}>
+            {rd.text.padStart(4)}
+          </span>
+        ) : (
+          <span className="inline-block w-[4ch] text-center text-[var(--text-dim)]">
+            {'--'.padStart(4)}
+          </span>
+        )}
         <span className="text-[var(--border)]"> │ </span>
         <span className="inline-block w-[6ch] text-center text-[var(--text-dim)]">
           {thru.padStart(6)}

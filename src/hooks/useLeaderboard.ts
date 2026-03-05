@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { TournamentInfo, PlayerWithStats, ApiLeaderboardResponse, CourseInfo } from '@/lib/types';
+import { TournamentInfo, PlayerWithStats, ApiLeaderboardResponse, CourseInfo, ActiveTournament } from '@/lib/types';
 
 // Mon/Tue/Wed (days 1-3): no tournament action, poll once an hour
 // Thu–Sun (days 4-6, 0): tournament days, poll every 5 minutes
@@ -14,6 +14,7 @@ interface UseLeaderboardReturn {
   tournament: TournamentInfo | null;
   players: PlayerWithStats[];
   courseInfo: CourseInfo | null;
+  activeTournaments: ActiveTournament[];
   loading: boolean;
   error: string | null;
   lastFetched: Date | null;
@@ -21,10 +22,11 @@ interface UseLeaderboardReturn {
   refresh: () => Promise<void>;
 }
 
-export function useLeaderboard(): UseLeaderboardReturn {
+export function useLeaderboard(tournId?: string | null, year?: string | null): UseLeaderboardReturn {
   const [tournament, setTournament] = useState<TournamentInfo | null>(null);
   const [players, setPlayers] = useState<PlayerWithStats[]>([]);
   const [courseInfo, setCourseInfo] = useState<CourseInfo | null>(null);
+  const [activeTournaments, setActiveTournaments] = useState<ActiveTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
@@ -35,7 +37,13 @@ export function useLeaderboard(): UseLeaderboardReturn {
     setError(null);
 
     try {
-      const response = await fetch('/api/leaderboard');
+      const params = new URLSearchParams();
+      if (tournId) params.set('tournId', tournId);
+      if (year) params.set('year', year);
+      const qs = params.toString();
+      const url = qs ? `/api/leaderboard?${qs}` : '/api/leaderboard';
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch: ${response.status}`);
@@ -46,6 +54,7 @@ export function useLeaderboard(): UseLeaderboardReturn {
       setTournament(data.info);
       setPlayers(data.players);
       setCourseInfo(data.courseInfo || null);
+      setActiveTournaments(data.activeTournaments || []);
       setLastFetched(new Date(data.fetchedAt));
       setSecondsUntilRefresh(getRefreshInterval() / 1000);
     } catch (err) {
@@ -53,9 +62,9 @@ export function useLeaderboard(): UseLeaderboardReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [tournId, year]);
 
-  // Initial fetch
+  // Initial fetch + re-fetch when tournId/year change
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -84,6 +93,7 @@ export function useLeaderboard(): UseLeaderboardReturn {
     tournament,
     players,
     courseInfo,
+    activeTournaments,
     loading,
     error,
     lastFetched,

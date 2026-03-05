@@ -11,6 +11,7 @@ import {
   PlayerWithStats,
   TournamentInfo,
   CourseInfo,
+  ActiveTournament,
 } from './types';
 import { isValidPGATourEvent } from './tourFilters';
 
@@ -207,6 +208,73 @@ export async function getCurrentTournament(): Promise<{ tournId: string; name: s
   return null;
 }
 
+// Get ALL currently active tournaments (in-progress + just-ended fallback)
+// Used to populate the multi-tournament toggle on the home page
+export async function getCurrentTournaments(): Promise<ActiveTournament[]> {
+  const cacheKey = 'current-tournaments';
+  const cached = tournamentCache.get(cacheKey);
+  if (cached && Date.now() - cached.cachedAt < TOURNAMENT_CACHE_DURATION_MS) {
+    return (cached.data as unknown as ActiveTournament[]);
+  }
+
+  const apiKey = process.env.SLASHGOLF_API_KEY;
+  if (!apiKey) return [];
+
+  const currentYear = new Date().getFullYear();
+  const yearsToTry = [currentYear, currentYear - 1];
+  const now = Date.now();
+
+  const inProgress: ActiveTournament[] = [];
+  const justEnded: ActiveTournament[] = [];
+
+  for (const year of yearsToTry) {
+    try {
+      const response = await fetch(
+        `${SLASHGOLF_BASE_URL}/schedule?orgId=1&year=${year}`,
+        {
+          headers: {
+            'x-rapidapi-key': apiKey,
+            'x-rapidapi-host': 'live-golf-data.p.rapidapi.com',
+          },
+        }
+      );
+
+      if (!response.ok) continue;
+
+      const data = await response.json();
+
+      for (const tournament of data.schedule || []) {
+        if (!isValidPGATourEvent(tournament.name)) continue;
+
+        const start = tournament.date?.start?.$date?.$numberLong;
+        const end = tournament.date?.end?.$date?.$numberLong;
+
+        if (start && end) {
+          const startMs = parseInt(start, 10);
+          const endMs = parseInt(end, 10);
+          const mondayCutoff = getMondayMidnightAfter(endMs);
+
+          if (now >= startMs && now <= endMs) {
+            inProgress.push({ tournId: tournament.tournId, name: tournament.name, year: String(year) });
+          } else if (now > endMs && now <= mondayCutoff) {
+            justEnded.push({ tournId: tournament.tournId, name: tournament.name, year: String(year) });
+          }
+        }
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  const result = inProgress.length > 0 ? inProgress : justEnded;
+
+  // Store in tournament cache (reuse the map with a special key)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (tournamentCache as Map<string, { data: any; cachedAt: number }>).set(cacheKey, { data: result, cachedAt: Date.now() });
+
+  return result;
+}
+
 // Find player ID by name from SlashGolf leaderboard
 export async function findPlayerId(
   playerName: string,
@@ -368,15 +436,27 @@ export function getCacheStats(): { size: number; entries: string[] } {
 // Live Leaderboard Function
 // ============================================
 
-// Fetch live leaderboard for current tournament
-export async function fetchLiveLeaderboard(): Promise<{
+// Fetch live leaderboard for current tournament (or a specific tournament if tournId/year provided)
+export async function fetchLiveLeaderboard(tournId?: string, year?: string): Promise<{
   info: TournamentInfo;
   players: PlayerWithStats[];
   isLive: boolean;
   courseName: string;
   courseInfoFull?: CourseInfo | null;
+  activeTournaments: ActiveTournament[];
 }> {
-  const tournament = await getCurrentTournament();
+  const activeTournaments = await getCurrentTournaments();
+
+  // Use provided tournId/year or fall back to getCurrentTournament()
+  let tournament: { tournId: string; name: string; year: string; isPreview: boolean; startDate?: string; endDate?: string } | null;
+  if (tournId && year) {
+    // Find the name from activeTournaments if possible
+    const match = activeTournaments.find(t => t.tournId === tournId);
+    tournament = { tournId, name: match?.name || '', year, isPreview: false };
+  } else {
+    tournament = await getCurrentTournament();
+  }
+
   if (!tournament) {
     return {
       info: {
@@ -387,13 +467,14 @@ export async function fetchLiveLeaderboard(): Promise<{
       players: [],
       isLive: false,
       courseName: '',
+      activeTournaments,
     };
   }
 
   const cacheKey = `live-${tournament.tournId}-${tournament.year}`;
   const cached = leaderboardCache.get(cacheKey);
   if (cached && Date.now() - cached.cachedAt < LIVE_CACHE_DURATION_MS) {
-    return { ...cached.data, isLive: !tournament.isPreview };
+    return { ...cached.data, isLive: !tournament.isPreview, activeTournaments };
   }
 
   const apiKey = process.env.SLASHGOLF_API_KEY;
@@ -431,7 +512,7 @@ export async function fetchLiveLeaderboard(): Promise<{
         courseInfoFull: courseInfo,
       };
       leaderboardCache.set(cacheKey, { data: previewResult, cachedAt: Date.now() });
-      return { ...previewResult, isLive: false };
+      return { ...previewResult, isLive: false, activeTournaments };
     }
     throw new Error(`SlashGolf API error: ${response.status}`);
   }
@@ -458,9 +539,17 @@ export async function fetchLiveLeaderboard(): Promise<{
   }
 
   // Determine current round from tournament data
+  // Use the API's currentRound field as primary signal — rounds.length is unreliable
+  // because the API may not add an entry for the in-progress round until a player tees off.
   let currentRound = 1;
-  if (data.leaderboardRows?.[0]?.rounds) {
-    currentRound = data.leaderboardRows[0].rounds.length;
+  for (const row of data.leaderboardRows || []) {
+    const rowRound = parseNumber(row.currentRound);
+    if (rowRound > currentRound) {
+      currentRound = rowRound;
+    }
+    if (row.rounds && row.rounds.length > currentRound) {
+      currentRound = row.rounds.length;
+    }
   }
 
   const players: PlayerWithStats[] = (data.leaderboardRows || []).map((row: LeaderboardRow) => {
@@ -495,40 +584,47 @@ export async function fetchLiveLeaderboard(): Promise<{
     }
 
     // Parse today's score - only show if player has started current round
-    // Note: scoreToPar is CUMULATIVE, so we need to subtract previous round to get individual round score
     let today: number | null = null;
     const rounds = row.rounds || [];
 
     // Player has started today's round if their rounds count matches tournament round
+    // Note: scoreToPar in each round entry is per-round (not cumulative)
     if (rounds.length >= currentRound && rounds.length > 0) {
       const currentRoundData = rounds[currentRound - 1];
       if (currentRoundData?.scoreToPar) {
-        const currentCumulative = currentRoundData.scoreToPar === 'E'
+        today = currentRoundData.scoreToPar === 'E'
           ? 0
           : parseInt(currentRoundData.scoreToPar.replace('+', ''), 10) || 0;
-
-        // For R1, individual score equals cumulative
-        // For R2+, subtract previous round's cumulative to get individual round score
-        if (currentRound === 1) {
-          today = currentCumulative;
-        } else {
-          const prevRoundData = rounds[currentRound - 2];
-          const prevCumulative = prevRoundData?.scoreToPar
-            ? (prevRoundData.scoreToPar === 'E' ? 0 : parseInt(prevRoundData.scoreToPar.replace('+', ''), 10) || 0)
-            : 0;
-          today = currentCumulative - prevCumulative;
-        }
       }
     }
 
-    // Parse round scores
-    const roundScores = rounds.map((r) => {
+    // Fallback: in-progress round not yet in rounds array
+    // e.g. currentRound=3 but rounds.length=2 (no R3 entry yet)
+    if (today === null && currentRound > 1 && rounds.length === currentRound - 1) {
+      const completedSum = rounds.reduce((sum, r) => {
+        if (r.scoreToPar) {
+          return sum + (r.scoreToPar === 'E' ? 0
+            : parseInt(r.scoreToPar.replace('+', ''), 10) || 0);
+        }
+        return sum;
+      }, 0);
+      today = totalScore - completedSum;
+    }
+
+    // Parse round scores — scoreToPar is per-round
+    const roundScores: (number | undefined)[] = rounds.map((r) => {
       if (r.scoreToPar) {
-        const s = r.scoreToPar;
-        return s === 'E' ? 0 : parseInt(s.replace('+', ''), 10) || 0;
+        return r.scoreToPar === 'E' ? 0
+          : parseInt(r.scoreToPar.replace('+', ''), 10) || 0;
       }
-      return 0;
+      return undefined;
     });
+
+    // If the in-progress round isn't in the rounds array, slot today's score in
+    if (today !== null && roundScores.length < currentRound) {
+      while (roundScores.length < currentRound - 1) roundScores.push(undefined);
+      roundScores.push(today);
+    }
 
     const playerName = `${row.firstName || ''} ${row.lastName || ''}`.trim();
 
@@ -577,7 +673,7 @@ export async function fetchLiveLeaderboard(): Promise<{
   leaderboardCache.set(cacheKey, { data: result, cachedAt: Date.now() });
 
   // If the tournament was marked as preview but the API returned 200, it started early — treat as live
-  return { ...result, isLive: true };
+  return { ...result, isLive: true, activeTournaments };
 }
 
 // ============================================

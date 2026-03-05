@@ -1,20 +1,25 @@
 'use client';
 
+import { useState } from 'react';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { Header } from '@/components/Header';
 import { Leaderboard } from '@/components/Leaderboard';
 import { borderTop, borderBottom, borderMid, BOX_WIDTH } from '@/lib/ascii';
 
 export default function Home() {
+  const [selectedTournId, setSelectedTournId] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+
   const {
     tournament,
     players,
     courseInfo,
+    activeTournaments,
     loading,
     error,
     lastFetched,
     secondsUntilRefresh,
-  } = useLeaderboard();
+  } = useLeaderboard(selectedTournId, selectedYear);
 
   const padLine = (content: string) => `│${content.padEnd(BOX_WIDTH)}│`;
 
@@ -26,6 +31,9 @@ export default function Home() {
         timeZoneName: 'short',
       })
     : null;
+
+  // Determine which tournament is selected for the toggle highlight
+  const effectiveTournId = selectedTournId || tournament?.tournId || null;
 
   return (
     <main className="font-mono text-sm">
@@ -40,6 +48,28 @@ export default function Home() {
         coursePar={courseInfo?.par}
         isPreview={tournament?.isPreview}
       />
+
+      {/* Tournament toggle — only shown when 2+ tournaments are active */}
+      {activeTournaments.length > 1 && (
+        <div className="my-4 flex gap-4 text-sm">
+          {activeTournaments.map((t) => (
+            <button
+              key={t.tournId}
+              onClick={() => {
+                setSelectedTournId(t.tournId);
+                setSelectedYear(t.year);
+              }}
+              className={`px-4 py-1 border transition-colors ${
+                effectiveTournId === t.tournId
+                  ? 'border-[var(--green)] text-[var(--green)] bg-[var(--bg-highlight)]'
+                  : 'border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--text)]'
+              }`}
+            >
+              {t.name.split(' ').slice(0, 3).join(' ').toUpperCase()}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Error state */}
       {error && (
