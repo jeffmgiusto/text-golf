@@ -607,17 +607,22 @@ export async function fetchLiveLeaderboard(tournId?: string, year?: string): Pro
       }
     }
 
-    // Fallback: in-progress round not yet in rounds array
-    // e.g. currentRound=3 but rounds.length=2 (no R3 entry yet)
-    if (today === null && currentRound > 1 && rounds.length === currentRound - 1) {
-      const completedSum = rounds.reduce((sum, r) => {
-        if (r.scoreToPar) {
-          return sum + (r.scoreToPar === 'E' ? 0
-            : parseInt(r.scoreToPar.replace('+', ''), 10) || 0);
-        }
-        return sum;
-      }, 0);
-      today = totalScore - completedSum;
+    // Fallback: compute today from totalScore minus completed rounds
+    // Handles: rounds array shorter than currentRound (including round 1 with empty array),
+    // or rounds array has an entry for the current round but scoreToPar is missing.
+    if (today === null) {
+      const thruVal = typeof thru === 'number' ? thru : (thru === 'F' ? 18 : parseInt(String(thru), 10) || 0);
+      if (thruVal > 0) {
+        const completedRounds = rounds.slice(0, currentRound - 1);
+        const completedSum = completedRounds.reduce((sum, r) => {
+          if (r.scoreToPar) {
+            return sum + (r.scoreToPar === 'E' ? 0
+              : parseInt(r.scoreToPar.replace('+', ''), 10) || 0);
+          }
+          return sum;
+        }, 0);
+        today = totalScore - completedSum;
+      }
     }
 
     // Parse round scores — scoreToPar is per-round
@@ -629,10 +634,12 @@ export async function fetchLiveLeaderboard(tournId?: string, year?: string): Pro
       return undefined;
     });
 
-    // If the in-progress round isn't in the rounds array, slot today's score in
-    if (today !== null && roundScores.length < currentRound) {
-      while (roundScores.length < currentRound - 1) roundScores.push(undefined);
-      roundScores.push(today);
+    // Fill in current round score from today if not already set
+    if (today !== null) {
+      while (roundScores.length < currentRound) roundScores.push(undefined);
+      if (roundScores[currentRound - 1] === undefined) {
+        roundScores[currentRound - 1] = today;
+      }
     }
 
     const playerName = `${row.firstName || ''} ${row.lastName || ''}`.trim();
