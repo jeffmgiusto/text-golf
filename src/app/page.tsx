@@ -111,7 +111,7 @@ export default function Home() {
 
       {/* Leaderboard */}
       {(!loading || players.length > 0) && !(tournament?.isPreview && players.length === 0) ? (
-        <Leaderboard players={players} />
+        <Leaderboard players={players} tournId={selectedTournId || tournament?.tournId} year={selectedYear || tournament?.year} />
       ) : null}
 
       {/* Footer */}

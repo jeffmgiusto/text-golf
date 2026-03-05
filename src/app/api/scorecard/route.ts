@@ -8,6 +8,8 @@ import { ScorecardApiResponse } from '@/lib/types';
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const playerName = searchParams.get('player');
+  const tournId = searchParams.get('tournId');
+  const year = searchParams.get('year');
 
   if (!playerName) {
     return NextResponse.json(
@@ -17,7 +19,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const scorecard = await fetchScorecard(playerName);
+    const scorecard = await fetchScorecard(playerName, tournId, year);
 
     const response: ScorecardApiResponse = {
       scorecard,

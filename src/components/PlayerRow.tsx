@@ -8,6 +8,8 @@ import { tableBorder, LEADERBOARD_COLS } from '@/lib/ascii';
 interface PlayerRowProps {
   player: PlayerWithStats;
   isLast: boolean;
+  tournId?: string | null;
+  year?: string | null;
 }
 
 function formatScore(score: number): { text: string; colorClass: string } {
@@ -26,7 +28,7 @@ function formatThru(thru: number | string): string {
   return val;
 }
 
-export function PlayerRow({ player, isLast }: PlayerRowProps) {
+export function PlayerRow({ player, isLast, tournId, year }: PlayerRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const score = formatScore(player.current_score);
@@ -78,7 +80,7 @@ export function PlayerRow({ player, isLast }: PlayerRowProps) {
 
       {/* Expanded details */}
       {isExpanded && (
-        <PlayerDetails player={player} />
+        <PlayerDetails player={player} tournId={tournId} year={year} />
       )}
 
       {/* Row separator (except for last row) */}

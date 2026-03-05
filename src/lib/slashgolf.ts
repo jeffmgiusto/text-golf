@@ -329,9 +329,13 @@ export async function findPlayerId(
 // Fetch scorecard for a player
 export async function fetchScorecard(
   playerName: string,
+  tournIdParam?: string | null,
+  yearParam?: string | null,
   forceRefresh = false
 ): Promise<ProcessedScorecard | null> {
-  const cacheKey = playerName.toLowerCase();
+  const cacheKey = tournIdParam && yearParam
+    ? `${playerName.toLowerCase()}-${tournIdParam}-${yearParam}`
+    : playerName.toLowerCase();
 
   // Check cache first
   if (!forceRefresh) {
@@ -346,8 +350,13 @@ export async function fetchScorecard(
     throw new Error('SLASHGOLF_API_KEY is not configured');
   }
 
-  // Get current tournament (uses 30-minute cache)
-  const tournament = await getCurrentTournament();
+  // Use provided tournament context or fall back to current tournament
+  let tournament: { tournId: string; name: string; year: string } | null;
+  if (tournIdParam && yearParam) {
+    tournament = { tournId: tournIdParam, name: '', year: yearParam };
+  } else {
+    tournament = await getCurrentTournament();
+  }
   if (!tournament) {
     throw new Error('No active tournament found');
   }

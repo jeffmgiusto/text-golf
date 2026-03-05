@@ -6,6 +6,8 @@ import { borderMid } from '@/lib/ascii';
 
 interface ScorecardProps {
   playerName: string;
+  tournId?: string | null;
+  year?: string | null;
 }
 
 function getScoreColor(score: number | null, par: number): string {
@@ -42,7 +44,7 @@ function ScorecardRow({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function Scorecard({ playerName }: ScorecardProps) {
+export function Scorecard({ playerName, tournId, year }: ScorecardProps) {
   const [scorecard, setScorecard] = useState<ProcessedScorecard | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +57,10 @@ export function Scorecard({ playerName }: ScorecardProps) {
       setError(null);
 
       try {
-        const response = await fetch(`/api/scorecard?player=${encodeURIComponent(playerName)}`);
+        const params = new URLSearchParams({ player: playerName });
+        if (tournId) params.set('tournId', tournId);
+        if (year) params.set('year', year);
+        const response = await fetch(`/api/scorecard?${params}`);
         const data: ScorecardApiResponse = await response.json();
 
         if (cancelled) return;
@@ -82,7 +87,7 @@ export function Scorecard({ playerName }: ScorecardProps) {
     return () => {
       cancelled = true;
     };
-  }, [playerName]);
+  }, [playerName, tournId, year]);
 
   // Loading state
   if (loading) {

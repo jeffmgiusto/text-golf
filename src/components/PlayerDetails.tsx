@@ -6,13 +6,15 @@ import { tableBorder, LEADERBOARD_COLS } from '@/lib/ascii';
 
 interface PlayerDetailsProps {
   player: PlayerWithStats;
+  tournId?: string | null;
+  year?: string | null;
 }
 
-export function PlayerDetails({ player }: PlayerDetailsProps) {
+export function PlayerDetails({ player, tournId, year }: PlayerDetailsProps) {
   return (
     <div className="bg-[var(--bg-highlight)] text-xs">
       {/* Scorecard */}
-      <Scorecard playerName={player.player_name} />
+      <Scorecard playerName={player.player_name} tournId={tournId} year={year} />
 
       {/* Separator after details */}
       <div className="text-[var(--border)]">

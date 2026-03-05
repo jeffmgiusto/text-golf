@@ -7,6 +7,8 @@ import { tableBorder, LEADERBOARD_COLS } from '@/lib/ascii';
 
 interface LeaderboardProps {
   players: PlayerWithStats[];
+  tournId?: string | null;
+  year?: string | null;
 }
 
 type SortColumn = 'pos' | 'player' | 'score' | 'rd' | 'thru';
@@ -25,7 +27,7 @@ function parseThru(thru: string | number): number {
   return parseInt(val, 10) || 0;
 }
 
-export function Leaderboard({ players }: LeaderboardProps) {
+export function Leaderboard({ players, tournId, year }: LeaderboardProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('pos');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
@@ -137,6 +139,8 @@ export function Leaderboard({ players }: LeaderboardProps) {
             key={player.playerId || index}
             player={player}
             isLast={index === sortedPlayers.length - 1}
+            tournId={tournId}
+            year={year}
           />
         ))}
 
