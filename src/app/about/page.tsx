@@ -28,6 +28,10 @@ export default function AboutPage() {
           {' '}<span className="text-[var(--text-dim)]">No ads. No clutter. Just scores.</span>
         </AsciiRow>
         <AsciiRow>{'\u00A0'}</AsciiRow>
+        <AsciiRow>
+          {' '}<a href="https://buymeacoffee.com/txtgolf" target="_blank" rel="noopener noreferrer" className="text-[var(--green)] underline">Keep Text Golf going</a>
+        </AsciiRow>
+        <AsciiRow>{'\u00A0'}</AsciiRow>
       </AsciiBox>
 
       {/* Features */}
