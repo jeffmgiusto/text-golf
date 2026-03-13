@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { TournamentInfo, PlayerWithStats, ApiLeaderboardResponse, CourseInfo, ActiveTournament } from '@/lib/types';
 
 // Mon/Tue/Wed (days 1-3): no tournament action, poll once an hour
-// Thu–Sun (days 4-6, 0): tournament days, poll every 5 minutes
+// Thu–Sun (days 4-6, 0): tournament days, poll every 3 minutes
 function getRefreshInterval(): number {
   const day = new Date().getDay();
-  return day >= 1 && day <= 3 ? 60 * 60 * 1000 : 5 * 60 * 1000;
+  return day >= 1 && day <= 3 ? 60 * 60 * 1000 : 3 * 60 * 1000;
 }
 
 interface UseLeaderboardReturn {

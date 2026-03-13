@@ -67,7 +67,7 @@ export function Header({
           <>
             <span className="text-[var(--text-dim)]">{'  |  '}</span>
             <span className="text-[var(--blue)]">
-              {weather.temp}°F {weather.icon} {weather.condition}{'  '}
+              {weather.temp}°F {weather.condition}{'  '}
               AM: {weather.windAm}mph{'  '}PM: {weather.windPm}mph
             </span>
           </>
