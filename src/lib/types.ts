@@ -221,3 +221,19 @@ export interface CourseInfo {
 export interface TournamentInfoWithCourse extends TournamentInfo {
   course?: CourseInfo;
 }
+
+// ============================================
+// Weather Types
+// ============================================
+
+export interface WeatherData {
+  temp: number;          // Fahrenheit, rounded integer
+  condition: string;     // "Sunny", "Partly Cloudy", "Rain", etc.
+  icon: string;          // "☀", "⛅", "☁", "🌧", "⛈", "🌫", "💨"
+  windAm: number;        // AM wind mph, rounded integer
+  windPm: number;        // PM wind mph, rounded integer
+}
+
+export interface WeatherApiResponse {
+  weather: WeatherData | null;
+}

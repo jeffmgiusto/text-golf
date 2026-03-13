@@ -42,3 +42,6 @@ next-env.d.ts
 
 # personal dev notes
 scratchpad.md
+
+# work in progress (shelved features)
+/_wip/

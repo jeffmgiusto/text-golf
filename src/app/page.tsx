@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
+import { useWeather } from '@/hooks/useWeather';
 import { Header } from '@/components/Header';
 import { Leaderboard } from '@/components/Leaderboard';
 import { borderTop, borderBottom, borderMid, BOX_WIDTH } from '@/lib/ascii';
@@ -20,6 +21,8 @@ export default function Home() {
     lastFetched,
     secondsUntilRefresh,
   } = useLeaderboard(selectedTournId, selectedYear);
+
+  const weather = useWeather(courseInfo?.location);
 
   const padLine = (content: string) => `│${content.padEnd(BOX_WIDTH)}│`;
 
@@ -47,6 +50,7 @@ export default function Home() {
         courseName={courseInfo?.courseName}
         coursePar={courseInfo?.par}
         isPreview={tournament?.isPreview}
+        weather={weather}
       />
 
       {/* Tournament toggle — only shown when 2+ tournaments are active */}

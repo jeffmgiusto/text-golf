@@ -1,6 +1,7 @@
 'use client';
 
 import { AsciiBox, AsciiRow, AsciiDivider } from './AsciiBox';
+import { WeatherData } from '@/lib/types';
 
 interface HeaderProps {
   tournamentName: string;
@@ -11,6 +12,7 @@ interface HeaderProps {
   courseName?: string;
   coursePar?: number;
   isPreview?: boolean;
+  weather?: WeatherData | null;
 }
 
 export function Header({
@@ -22,6 +24,7 @@ export function Header({
   courseName,
   coursePar,
   isPreview,
+  weather,
 }: HeaderProps) {
   const formatCountdown = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -55,11 +58,20 @@ export function Header({
         </AsciiRow>
       )}
 
-      {/* Round info */}
+      {/* Round info + weather */}
       <AsciiRow>
         <span className="text-[var(--text-dim)]">
           Round {currentRound}
         </span>
+        {weather && (
+          <>
+            <span className="text-[var(--text-dim)]">{'  |  '}</span>
+            <span className="text-[var(--blue)]">
+              {weather.temp}°F {weather.icon} {weather.condition}{'  '}
+              AM: {weather.windAm}mph{'  '}PM: {weather.windPm}mph
+            </span>
+          </>
+        )}
       </AsciiRow>
 
       {/* Divider */}
