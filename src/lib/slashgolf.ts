@@ -672,6 +672,8 @@ export async function fetchLiveLeaderboard(tournId?: string, year?: string): Pro
     };
   });
 
+  const courseInfo = await fetchCourseInfo(tournament.tournId, tournament.year);
+
   const result = {
     info: {
       event_name: tournament.name,
@@ -683,6 +685,7 @@ export async function fetchLiveLeaderboard(tournId?: string, year?: string): Pro
     },
     players,
     courseName,
+    courseInfoFull: courseInfo,
   };
 
   // Cache the result
