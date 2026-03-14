@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useWeather } from '@/hooks/useWeather';
+import { useTeeTimes } from '@/hooks/useTeeTimes';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Header } from '@/components/Header';
 import { Leaderboard } from '@/components/Leaderboard';
@@ -24,6 +25,7 @@ export default function Home() {
   } = useLeaderboard(selectedTournId, selectedYear);
 
   const weather = useWeather(courseInfo?.location);
+  const teeTimes = useTeeTimes();
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
   const [viewMode, setViewMode] = useState<'full' | 'favorites'>('full');
 
@@ -144,7 +146,7 @@ export default function Home() {
 
       {/* Leaderboard */}
       {(!loading || players.length > 0) && !(tournament?.isPreview && players.length === 0) ? (
-        <Leaderboard players={players} tournId={selectedTournId || tournament?.tournId} year={selectedYear || tournament?.year} isFavorite={isFavorite} toggleFavorite={toggleFavorite} viewMode={viewMode} />
+        <Leaderboard players={players} tournId={selectedTournId || tournament?.tournId} year={selectedYear || tournament?.year} isFavorite={isFavorite} toggleFavorite={toggleFavorite} viewMode={viewMode} teeTimes={teeTimes} />
       ) : null}
 
       {/* Footer */}

@@ -12,6 +12,7 @@ interface PlayerRowProps {
   year?: string | null;
   isFavorited: boolean;
   toggleFavorite: (playerId: string) => void;
+  teeTime?: string;
 }
 
 function formatScore(score: number): { text: string; colorClass: string } {
@@ -30,11 +31,12 @@ function formatThru(thru: number | string): string {
   return val;
 }
 
-export function PlayerRow({ player, isLast, tournId, year, isFavorited, toggleFavorite }: PlayerRowProps) {
+export function PlayerRow({ player, isLast, tournId, year, isFavorited, toggleFavorite, teeTime }: PlayerRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const score = formatScore(player.current_score);
-  const thru = formatThru(player.thru);
+  const rawThru = formatThru(player.thru);
+  const thru = player.today === null && teeTime ? teeTime : rawThru;
 
   // Truncate player name (27 chars max, leaving room for expand icon)
   const displayName = player.player_name.length > 27

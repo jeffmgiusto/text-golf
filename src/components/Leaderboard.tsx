@@ -12,6 +12,7 @@ interface LeaderboardProps {
   isFavorite: (playerId: string) => boolean;
   toggleFavorite: (playerId: string) => void;
   viewMode: 'full' | 'favorites';
+  teeTimes?: Record<string, string>;
 }
 
 type SortColumn = 'pos' | 'player' | 'score' | 'rd' | 'thru';
@@ -30,7 +31,7 @@ function parseThru(thru: string | number): number {
   return parseInt(val, 10) || 0;
 }
 
-export function Leaderboard({ players, tournId, year, isFavorite, toggleFavorite, viewMode }: LeaderboardProps) {
+export function Leaderboard({ players, tournId, year, isFavorite, toggleFavorite, viewMode, teeTimes }: LeaderboardProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('pos');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
@@ -162,6 +163,7 @@ export function Leaderboard({ players, tournId, year, isFavorite, toggleFavorite
               year={year}
               isFavorited={isFavorite(player.playerId)}
               toggleFavorite={toggleFavorite}
+              teeTime={teeTimes?.[player.player_name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()]}
             />
           ))
         )}
