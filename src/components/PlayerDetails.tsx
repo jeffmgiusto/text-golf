@@ -8,13 +8,15 @@ interface PlayerDetailsProps {
   player: PlayerWithStats;
   tournId?: string | null;
   year?: string | null;
+  isFavorited: boolean;
+  toggleFavorite: (playerId: string) => void;
 }
 
-export function PlayerDetails({ player, tournId, year }: PlayerDetailsProps) {
+export function PlayerDetails({ player, tournId, year, isFavorited, toggleFavorite }: PlayerDetailsProps) {
   return (
     <div className="bg-[var(--bg-highlight)] text-xs">
       {/* Scorecard */}
-      <Scorecard playerName={player.player_name} tournId={tournId} year={year} />
+      <Scorecard playerName={player.player_name} playerId={player.playerId} tournId={tournId} year={year} isFavorited={isFavorited} toggleFavorite={toggleFavorite} />
 
       {/* Separator after details */}
       <div className="text-[var(--border)]">

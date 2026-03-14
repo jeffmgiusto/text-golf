@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useWeather } from '@/hooks/useWeather';
+import { useFavorites } from '@/hooks/useFavorites';
 import { Header } from '@/components/Header';
 import { Leaderboard } from '@/components/Leaderboard';
 import { borderTop, borderBottom, borderMid, BOX_WIDTH } from '@/lib/ascii';
@@ -23,6 +24,8 @@ export default function Home() {
   } = useLeaderboard(selectedTournId, selectedYear);
 
   const weather = useWeather(courseInfo?.location);
+  const { favorites, isFavorite, toggleFavorite } = useFavorites();
+  const [viewMode, setViewMode] = useState<'full' | 'favorites'>('full');
 
   const padLine = (content: string) => `│${content.padEnd(BOX_WIDTH)}│`;
 
@@ -75,6 +78,32 @@ export default function Home() {
         </div>
       )}
 
+      {/* View mode toggle */}
+      {players.length > 0 && (
+        <div className="my-4 flex gap-4 text-sm">
+          <button
+            onClick={() => setViewMode('full')}
+            className={`px-4 py-1 border transition-colors ${
+              viewMode === 'full'
+                ? 'border-[var(--green)] text-[var(--green)] bg-[var(--bg-highlight)]'
+                : 'border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--text)]'
+            }`}
+          >
+            ALL
+          </button>
+          <button
+            onClick={() => setViewMode('favorites')}
+            className={`px-4 py-1 border transition-colors ${
+              viewMode === 'favorites'
+                ? 'border-[var(--green)] text-[var(--green)] bg-[var(--bg-highlight)]'
+                : 'border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--text)]'
+            }`}
+          >
+            FAVORITES{favorites.length > 0 ? ` (${favorites.length})` : ''}
+          </button>
+        </div>
+      )}
+
       {/* Error state */}
       {error && (
         <div className="mb-4 p-4 bg-[var(--bg-secondary)] border border-red-500/50 rounded">
@@ -115,7 +144,7 @@ export default function Home() {
 
       {/* Leaderboard */}
       {(!loading || players.length > 0) && !(tournament?.isPreview && players.length === 0) ? (
-        <Leaderboard players={players} tournId={selectedTournId || tournament?.tournId} year={selectedYear || tournament?.year} />
+        <Leaderboard players={players} tournId={selectedTournId || tournament?.tournId} year={selectedYear || tournament?.year} isFavorite={isFavorite} toggleFavorite={toggleFavorite} viewMode={viewMode} />
       ) : null}
 
       {/* Footer */}

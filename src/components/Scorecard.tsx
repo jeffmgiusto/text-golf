@@ -6,8 +6,11 @@ import { borderMid } from '@/lib/ascii';
 
 interface ScorecardProps {
   playerName: string;
+  playerId: string;
   tournId?: string | null;
   year?: string | null;
+  isFavorited: boolean;
+  toggleFavorite: (playerId: string) => void;
 }
 
 function getScoreColor(score: number | null, par: number): string {
@@ -39,12 +42,27 @@ function calculateNineTotal(holes: { score: number | null }[], start: number): s
 function ScorecardRow({ children }: { children: React.ReactNode }) {
   return (
     <div className="text-[var(--border)]">
-      │<span className="inline-block w-[64ch] overflow-hidden">{' '}{children}</span>│
+      │<span className="inline-block w-[64ch] overflow-hidden pl-[1ch]">{children}</span>│
     </div>
   );
 }
 
-export function Scorecard({ playerName, tournId, year }: ScorecardProps) {
+function FavoriteStar({ playerId, isFavorited, toggleFavorite }: { playerId: string; isFavorited: boolean; toggleFavorite: (id: string) => void }) {
+  return (
+    <span
+      className="cursor-pointer hover:opacity-80 text-lg leading-none"
+      style={isFavorited ? { color: '#DAA520' } : undefined}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleFavorite(playerId);
+      }}
+    >
+      {isFavorited ? '★' : <span className="text-[var(--text-dim)]">☆</span>}
+    </span>
+  );
+}
+
+export function Scorecard({ playerName, playerId, tournId, year, isFavorited, toggleFavorite }: ScorecardProps) {
   const [scorecard, setScorecard] = useState<ProcessedScorecard | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,7 +125,10 @@ export function Scorecard({ playerName, tournId, year }: ScorecardProps) {
       <div className="mt-2">
         <div className="text-[var(--border)]">{borderMid()}</div>
         <ScorecardRow>
-          <span className="text-[var(--text-dim)]">SCORECARD</span>
+          <span className="inline-flex justify-between w-full">
+            <span className="text-[var(--text-dim)]">SCORECARD</span>
+            <FavoriteStar playerId={playerId} isFavorited={isFavorited} toggleFavorite={toggleFavorite} />
+          </span>
         </ScorecardRow>
         <div className="text-[var(--border)]">{borderMid()}</div>
         <ScorecardRow>
@@ -135,13 +156,18 @@ export function Scorecard({ playerName, tournId, year }: ScorecardProps) {
       {/* Scorecard header */}
       <div className="text-[var(--border)]">{borderMid()}</div>
       <ScorecardRow>
-        <span className="text-[var(--text-dim)]">SCORECARD</span>
-        <span className="text-[var(--text-dim)]"> - Round {latestRound.roundId}</span>
-        {latestRound.complete ? (
-          <span className="text-[var(--green)]"> (Complete)</span>
-        ) : (
-          <span className="text-[var(--yellow)]"> (Thru {latestRound.currentHole})</span>
-        )}
+        <span className="inline-flex justify-between w-full">
+          <span>
+            <span className="text-[var(--text-dim)]">SCORECARD</span>
+            <span className="text-[var(--text-dim)]"> - Round {latestRound.roundId}</span>
+            {latestRound.complete ? (
+              <span className="text-[var(--green)]"> (Complete)</span>
+            ) : (
+              <span className="text-[var(--yellow)]"> (Thru {latestRound.currentHole})</span>
+            )}
+          </span>
+          <FavoriteStar playerId={playerId} isFavorited={isFavorited} toggleFavorite={toggleFavorite} />
+        </span>
       </ScorecardRow>
       <div className="text-[var(--border)]">{borderMid()}</div>
 

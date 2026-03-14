@@ -77,15 +77,12 @@ export function Header({
       {/* Divider */}
       <AsciiDivider />
 
-      {/* Last updated */}
+      {/* Updated + refresh */}
       <AsciiRow>
         <span className="text-[var(--text-dim)]">
           Updated: {lastUpdated || 'Loading...'}
         </span>
-      </AsciiRow>
-
-      {/* Next refresh */}
-      <AsciiRow>
+        <span className="text-[var(--text-dim)]">{'  |  '}</span>
         {isLoading ? (
           <span className="text-[var(--yellow)] animate-pulse-slow">
             Refreshing...

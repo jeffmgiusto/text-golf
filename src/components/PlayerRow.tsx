@@ -10,6 +10,8 @@ interface PlayerRowProps {
   isLast: boolean;
   tournId?: string | null;
   year?: string | null;
+  isFavorited: boolean;
+  toggleFavorite: (playerId: string) => void;
 }
 
 function formatScore(score: number): { text: string; colorClass: string } {
@@ -28,7 +30,7 @@ function formatThru(thru: number | string): string {
   return val;
 }
 
-export function PlayerRow({ player, isLast, tournId, year }: PlayerRowProps) {
+export function PlayerRow({ player, isLast, tournId, year, isFavorited, toggleFavorite }: PlayerRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const score = formatScore(player.current_score);
@@ -49,7 +51,12 @@ export function PlayerRow({ player, isLast, tournId, year }: PlayerRowProps) {
         className="cursor-pointer hover:bg-[var(--bg-highlight)] transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <span className="text-[var(--border)]">│ </span>
+        <span className="text-[var(--border)]">│</span>
+        {isFavorited ? (
+          <span style={{ color: '#DAA520' }}>•</span>
+        ) : (
+          <span> </span>
+        )}
         <span className="inline-block w-[4ch] text-center text-[var(--text-dim)]">
           {String(player.current_pos).padStart(4)}
         </span>
@@ -80,7 +87,7 @@ export function PlayerRow({ player, isLast, tournId, year }: PlayerRowProps) {
 
       {/* Expanded details */}
       {isExpanded && (
-        <PlayerDetails player={player} tournId={tournId} year={year} />
+        <PlayerDetails player={player} tournId={tournId} year={year} isFavorited={isFavorited} toggleFavorite={toggleFavorite} />
       )}
 
       {/* Row separator (except for last row) */}

@@ -9,6 +9,9 @@ interface LeaderboardProps {
   players: PlayerWithStats[];
   tournId?: string | null;
   year?: string | null;
+  isFavorite: (playerId: string) => boolean;
+  toggleFavorite: (playerId: string) => void;
+  viewMode: 'full' | 'favorites';
 }
 
 type SortColumn = 'pos' | 'player' | 'score' | 'rd' | 'thru';
@@ -27,7 +30,7 @@ function parseThru(thru: string | number): number {
   return parseInt(val, 10) || 0;
 }
 
-export function Leaderboard({ players, tournId, year }: LeaderboardProps) {
+export function Leaderboard({ players, tournId, year, isFavorite, toggleFavorite, viewMode }: LeaderboardProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('pos');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
@@ -67,6 +70,13 @@ export function Leaderboard({ players, tournId, year }: LeaderboardProps) {
     });
     return sorted;
   }, [players, sortColumn, sortDirection]);
+
+  const displayPlayers = useMemo(() => {
+    if (viewMode === 'favorites') {
+      return sortedPlayers.filter((p) => isFavorite(p.playerId));
+    }
+    return sortedPlayers;
+  }, [sortedPlayers, viewMode, isFavorite]);
 
   const getSortIndicator = (column: SortColumn): string => {
     if (sortColumn !== column) return '  ';
@@ -134,15 +144,27 @@ export function Leaderboard({ players, tournId, year }: LeaderboardProps) {
         <div className="text-[var(--border)]">{tableBorder(LEADERBOARD_COLS, 'mid')}</div>
 
         {/* Player rows */}
-        {sortedPlayers.map((player, index) => (
-          <PlayerRow
-            key={player.playerId || index}
-            player={player}
-            isLast={index === sortedPlayers.length - 1}
-            tournId={tournId}
-            year={year}
-          />
-        ))}
+        {displayPlayers.length === 0 && viewMode === 'favorites' ? (
+          <div className="text-[var(--text-dim)] text-center py-4">
+            <span className="text-[var(--border)]">│ </span>
+            <span className="inline-block w-[64ch] text-center">
+              No favorites yet. Click a player and tap ☆ to add.
+            </span>
+            <span className="text-[var(--border)]"> │</span>
+          </div>
+        ) : (
+          displayPlayers.map((player, index) => (
+            <PlayerRow
+              key={player.playerId || index}
+              player={player}
+              isLast={index === displayPlayers.length - 1}
+              tournId={tournId}
+              year={year}
+              isFavorited={isFavorite(player.playerId)}
+              toggleFavorite={toggleFavorite}
+            />
+          ))
+        )}
 
         {/* Bottom border */}
         <div className="text-[var(--border)]">{tableBorder(LEADERBOARD_COLS, 'bottom')}</div>
