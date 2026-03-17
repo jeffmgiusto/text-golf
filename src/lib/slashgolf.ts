@@ -23,6 +23,7 @@ const SCORECARD_CACHE_DURATION_MS = 2 * 60 * 1000;      // 2 minutes for scoreca
 const SCHEDULE_CACHE_DURATION_MS = 5 * 60 * 1000;       // 5 minutes for schedules
 const TOURNAMENT_CACHE_DURATION_MS = 30 * 60 * 1000;    // 30 minutes for tournament info (rarely changes mid-event)
 const PLAYER_ID_CACHE_DURATION_MS = 30 * 60 * 1000;     // 30 minutes for player IDs
+const HISTORICAL_CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours for historical data
 
 // In-memory caches (server-side)
 const scorecardCache = new Map<string, { data: ProcessedScorecard; cachedAt: number }>();
@@ -900,7 +901,7 @@ export async function fetchHistoricalLeaderboard(
 ): Promise<{ tournament: { name: string; year: string; courseName: string }; players: HistoricalPlayer[] }> {
   const cacheKey = `leaderboard-${tournId}-${year}`;
   const cached = scheduleCache.get(cacheKey);
-  if (cached && Date.now() - cached.cachedAt < SCHEDULE_CACHE_DURATION_MS) {
+  if (cached && Date.now() - cached.cachedAt < HISTORICAL_CACHE_DURATION_MS) {
     return cached.data as { tournament: { name: string; year: string; courseName: string }; players: HistoricalPlayer[] };
   }
 
@@ -988,6 +989,53 @@ export async function fetchHistoricalLeaderboard(
     return result;
   } catch (error) {
     console.error('Failed to fetch historical leaderboard:', error);
+    throw error;
+  }
+}
+
+// Fetch list of PGA Tour tournaments for current year
+export async function fetchTournamentList(): Promise<Array<{ tournId: string; name: string }>> {
+  const cacheKey = 'tournament-list';
+  const cached = scheduleCache.get(cacheKey);
+  if (cached && Date.now() - cached.cachedAt < HISTORICAL_CACHE_DURATION_MS) {
+    return cached.data as Array<{ tournId: string; name: string }>;
+  }
+
+  const apiKey = process.env.SLASHGOLF_API_KEY;
+  if (!apiKey) {
+    throw new Error('SLASHGOLF_API_KEY is not configured');
+  }
+
+  const currentYear = new Date().getFullYear();
+
+  try {
+    const response = await fetch(
+      `${SLASHGOLF_BASE_URL}/schedule?orgId=1&year=${currentYear}`,
+      {
+        headers: {
+          'x-rapidapi-key': apiKey,
+          'x-rapidapi-host': 'live-golf-data.p.rapidapi.com',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`SlashGolf API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const tournaments: Array<{ tournId: string; name: string }> = [];
+    for (const tournament of data.schedule || []) {
+      if (!isValidPGATourEvent(tournament.name)) continue;
+      tournaments.push({ tournId: tournament.tournId, name: tournament.name });
+    }
+
+    scheduleCache.set(cacheKey, { data: tournaments, cachedAt: Date.now() });
+
+    return tournaments;
+  } catch (error) {
+    console.error('Failed to fetch tournament list:', error);
     throw error;
   }
 }

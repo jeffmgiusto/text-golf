@@ -7,6 +7,7 @@ import { borderTop, borderBottom } from '@/lib/ascii';
 const navItems = [
   { href: '/', label: 'HOME' },
   { href: '/tournaments', label: 'TOURNAMENTS' },
+  { href: '/history', label: 'HISTORY' },
   { href: '/rankings', label: 'RANKINGS' },
   { href: '/about', label: 'ABOUT' },
 ];
