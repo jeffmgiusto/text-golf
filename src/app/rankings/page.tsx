@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { RankingEntry } from '@/lib/types';
-import { tableBorder, RANKINGS_COLS } from '@/lib/ascii';
+import { tableBorder, RANKINGS_COLS, borderTop, borderBottom } from '@/lib/ascii';
 import { AsciiBox, AsciiRow } from '@/components/AsciiBox';
+import { Footer } from '@/components/Footer';
 
 type RankingType = 'owgr' | 'fedex';
 
@@ -72,8 +73,12 @@ export default function RankingsPage() {
 
       {/* Loading state */}
       {loading && (
-        <div className="text-[var(--text-dim)] text-sm text-center py-8">
-          Loading rankings...
+        <div className="text-center py-12">
+          <div className="text-[var(--text-dim)] animate-pulse-slow">
+            {borderTop(30)}<br />
+            │{'  Loading rankings...      '.padEnd(30)}│<br />
+            {borderBottom(30)}
+          </div>
         </div>
       )}
 
@@ -144,9 +149,7 @@ export default function RankingsPage() {
       )}
 
       {/* Footer */}
-      <div className="text-[var(--text-dim)] text-xs text-center mt-8">
-        Data provided by SlashGolf API
-      </div>
+      <Footer />
     </main>
   );
 }

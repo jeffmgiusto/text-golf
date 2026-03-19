@@ -9,6 +9,7 @@ import {
 } from '@/lib/types';
 import { borderTop, borderBottom, borderMid } from '@/lib/ascii';
 import { AsciiBox, AsciiRow, AsciiDivider } from '@/components/AsciiBox';
+import { Footer } from '@/components/Footer';
 
 function BoxRow({ children }: { children: React.ReactNode }) {
   return (
@@ -198,12 +199,7 @@ export default function TournamentsPage() {
       </section>
 
       {/* Footer */}
-      <div className="mt-8 text-center text-[var(--text-dim)] text-xs">
-        <div className="text-[var(--border)]">{'─'.repeat(40)}</div>
-        <div className="mt-2">
-          Data from SlashGolf API | Cached for 30 minutes
-        </div>
-      </div>
+      <Footer />
     </main>
   );
 }

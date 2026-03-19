@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { AsciiBox, AsciiRow, AsciiDivider } from '@/components/AsciiBox';
 import { AsciiChart } from '@/components/AsciiChart';
+import { borderTop, borderBottom } from '@/lib/ascii';
+import { Footer } from '@/components/Footer';
 
 interface Tournament {
   tournId: string;
@@ -142,13 +144,13 @@ export default function HistoryPage() {
 
       {/* Loading */}
       {loadingHistory && (
-        <AsciiBox className="mb-4">
-          <AsciiRow>
-            <span className="text-[var(--text-dim)] animate-pulse-slow">
-              Loading historical data...
-            </span>
-          </AsciiRow>
-        </AsciiBox>
+        <div className="text-center py-12">
+          <div className="text-[var(--text-dim)] animate-pulse-slow">
+            {borderTop(30)}<br />
+            │{'  Loading history...        '.padEnd(30)}│<br />
+            {borderBottom(30)}
+          </div>
+        </div>
       )}
 
       {/* Results */}
@@ -220,9 +222,7 @@ export default function HistoryPage() {
       )}
 
       {/* Footer */}
-      <div className="text-[var(--text-dim)] text-xs text-center mt-8">
-        Data provided by SlashGolf API
-      </div>
+      <Footer />
     </main>
   );
 }

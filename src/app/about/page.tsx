@@ -1,4 +1,8 @@
+import type { Metadata } from 'next';
 import { AsciiBox, AsciiRow, AsciiDivider } from '@/components/AsciiBox';
+import { Footer } from '@/components/Footer';
+
+export const metadata: Metadata = { title: 'About | Text Golf' };
 
 export default function AboutPage() {
   return (
@@ -28,8 +32,27 @@ export default function AboutPage() {
           {' '}<span className="text-[var(--text-dim)]">No ads. No clutter. Just scores.</span>
         </AsciiRow>
         <AsciiRow>{'\u00A0'}</AsciiRow>
+      </AsciiBox>
+
+      {/* Support Text Golf */}
+      <AsciiBox className="mb-6">
         <AsciiRow>
-          {' '}<a href="https://buymeacoffee.com/txtgolf" target="_blank" rel="noopener noreferrer" className="text-[var(--green)] underline">Keep Text Golf going</a>
+          <span className="text-[var(--yellow)]">SUPPORT TEXT GOLF</span>
+        </AsciiRow>
+        <AsciiDivider />
+        <AsciiRow>{'\u00A0'}</AsciiRow>
+        <AsciiRow>
+          {' '}<span className="text-[var(--text)]">Text Golf is free and always will be.</span>
+        </AsciiRow>
+        <AsciiRow>
+          {' '}<span className="text-[var(--text)]">If you enjoy it, consider buying me a coffee.</span>
+        </AsciiRow>
+        <AsciiRow>{'\u00A0'}</AsciiRow>
+        <AsciiRow>
+          {' '}<span className="text-[var(--green)]">▸</span>{' '}
+          <a href="https://buymeacoffee.com/txtgolf" target="_blank" rel="noopener noreferrer" className="text-[var(--green)] underline">
+            buymeacoffee.com/txtgolf
+          </a>
         </AsciiRow>
         <AsciiRow>{'\u00A0'}</AsciiRow>
       </AsciiBox>
@@ -42,7 +65,7 @@ export default function AboutPage() {
         <AsciiDivider />
         <AsciiRow>{'\u00A0'}</AsciiRow>
         <AsciiRow>
-          {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">Live leaderboard with sub-minute updates</span>
+          {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">Live leaderboard updated every 3 minutes</span>
         </AsciiRow>
         <AsciiRow>
           {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">Click any player to see their scorecard</span>
@@ -112,7 +135,7 @@ export default function AboutPage() {
         </AsciiRow>
         <AsciiRow>{'\u00A0'}</AsciiRow>
         <AsciiRow>
-          {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">Live leaderboards</span> <span className="text-[var(--text-dim)]">- Updated every minute</span>
+          {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">Live leaderboards</span> <span className="text-[var(--text-dim)]">- Updated every 3 minutes</span>
         </AsciiRow>
         <AsciiRow>
           {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">Hole-by-hole scorecards</span> <span className="text-[var(--text-dim)]">- Real-time updates</span>
@@ -134,7 +157,7 @@ export default function AboutPage() {
         <AsciiDivider />
         <AsciiRow>{'\u00A0'}</AsciiRow>
         <AsciiRow>
-          {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">Next.js 14</span> <span className="text-[var(--text-dim)]">- React framework</span>
+          {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">Next.js 16</span> <span className="text-[var(--text-dim)]">- React framework</span>
         </AsciiRow>
         <AsciiRow>
           {' '}<span className="text-[var(--green)]">▸</span> <span className="text-[var(--text)]">TypeScript</span> <span className="text-[var(--text-dim)]">- Type-safe JavaScript</span>
@@ -149,15 +172,14 @@ export default function AboutPage() {
       </AsciiBox>
 
       {/* Footer */}
-      <div className="mt-8 text-center text-[var(--text-dim)] text-xs">
-        <div className="text-[var(--border)]">{'─'.repeat(40)}</div>
+      <Footer>
         <div className="mt-4">
           <span className="text-[var(--text)]">TEXT GOLF</span> © {new Date().getFullYear()}
         </div>
         <div className="mt-2">
           Made with ♥ for golf fans who appreciate simplicity
         </div>
-      </div>
+      </Footer>
     </main>
   );
 }

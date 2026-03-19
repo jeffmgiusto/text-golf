@@ -51,9 +51,12 @@ export function Leaderboard({ players, tournId, year, isFavorite, toggleFavorite
         case 'pos':
           comparison = parsePosition(a.current_pos) - parsePosition(b.current_pos);
           break;
-        case 'player':
-          comparison = a.player_name.localeCompare(b.player_name);
+        case 'player': {
+          const lastA = a.player_name.split(' ').pop() ?? a.player_name;
+          const lastB = b.player_name.split(' ').pop() ?? b.player_name;
+          comparison = lastA.localeCompare(lastB);
           break;
+        }
         case 'score':
           comparison = a.current_score - b.current_score;
           break;

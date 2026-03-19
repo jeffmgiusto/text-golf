@@ -88,6 +88,8 @@ export async function fetchWeather(location: string): Promise<WeatherData | null
 
     let amWindSpeeds: number[] = [];
     let pmWindSpeeds: number[] = [];
+    let amRainChances: number[] = [];
+    let pmRainChances: number[] = [];
 
     for (const entry of forecast.list ?? []) {
       const entryUtcMs = entry.dt * 1000;
@@ -99,11 +101,14 @@ export async function fetchWeather(location: string): Promise<WeatherData | null
 
       const localHour = localDate.getUTCHours();
       const windSpeed = entry.wind?.speed ?? 0;
+      const pop = entry.pop ?? 0; // 0-1 precipitation probability
 
       if (localHour >= 6 && localHour < 12) {
         amWindSpeeds.push(windSpeed);
+        amRainChances.push(pop);
       } else if (localHour >= 12 && localHour < 18) {
         pmWindSpeeds.push(windSpeed);
+        pmRainChances.push(pop);
       }
     }
 
@@ -111,8 +116,10 @@ export async function fetchWeather(location: string): Promise<WeatherData | null
     const avg = (arr: number[]) => arr.length > 0 ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : Math.round(currentWind);
     const windAm = avg(amWindSpeeds);
     const windPm = avg(pmWindSpeeds);
+    const rainAm = amRainChances.length > 0 ? Math.round(Math.max(...amRainChances) * 100) : 0;
+    const rainPm = pmRainChances.length > 0 ? Math.round(Math.max(...pmRainChances) * 100) : 0;
 
-    const result: WeatherData = { temp, condition, icon, windAm, windPm };
+    const result: WeatherData = { temp, condition, icon, windAm, windPm, rainAm, rainPm };
     weatherCache.set(location, { data: result, cachedAt: Date.now() });
     return result;
   } catch {

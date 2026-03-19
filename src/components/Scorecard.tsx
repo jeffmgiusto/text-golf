@@ -50,7 +50,7 @@ function ScorecardRow({ children }: { children: React.ReactNode }) {
 function FavoriteStar({ playerId, isFavorited, toggleFavorite }: { playerId: string; isFavorited: boolean; toggleFavorite: (id: string) => void }) {
   return (
     <span
-      className="cursor-pointer hover:opacity-80 text-lg leading-none"
+      className="cursor-pointer hover:opacity-80 text-2xl leading-none"
       style={isFavorited ? { color: '#DAA520' } : undefined}
       onClick={(e) => {
         e.stopPropagation();

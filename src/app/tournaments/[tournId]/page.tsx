@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { HistoricalLeaderboardResponse, HistoricalPlayer } from '@/lib/types';
 import { borderTop, borderBottom, borderMid } from '@/lib/ascii';
 import { AsciiBox, AsciiRow } from '@/components/AsciiBox';
+import { Footer } from '@/components/Footer';
 
 function BoxRow({ children }: { children: React.ReactNode }) {
   return (
@@ -151,12 +152,7 @@ export default function TournamentDetailPage() {
       )}
 
       {/* Footer */}
-      <div className="mt-8 text-center text-[var(--text-dim)] text-xs">
-        <div className="text-[var(--border)]">{'─'.repeat(40)}</div>
-        <div className="mt-2">
-          Data from SlashGolf API
-        </div>
-      </div>
+      <Footer />
     </main>
   );
 }

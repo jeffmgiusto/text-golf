@@ -8,6 +8,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { Header } from '@/components/Header';
 import { Leaderboard } from '@/components/Leaderboard';
 import { borderTop, borderBottom, borderMid, BOX_WIDTH } from '@/lib/ascii';
+import { Footer } from '@/components/Footer';
 
 export default function Home() {
   const [selectedTournId, setSelectedTournId] = useState<string | null>(null);
@@ -150,15 +151,9 @@ export default function Home() {
       ) : null}
 
       {/* Footer */}
-      <div className="mt-8 text-center text-[var(--text-dim)] text-xs">
-        <div className="text-[var(--border)]">{'─'.repeat(40)}</div>
-        <div className="mt-2">
-          Powered by SlashGolf API | Updates every 5 minutes
-        </div>
-        <div className="mt-1">
-          Click any player row to see their scorecard
-        </div>
-      </div>
+      <Footer>
+        <div className="mt-1">Click any player row to see their scorecard</div>
+      </Footer>
     </main>
   );
 }

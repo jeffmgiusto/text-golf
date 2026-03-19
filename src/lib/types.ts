@@ -232,6 +232,8 @@ export interface WeatherData {
   icon: string;          // "☀", "⛅", "☁", "🌧", "⛈", "🌫", "💨"
   windAm: number;        // AM wind mph, rounded integer
   windPm: number;        // PM wind mph, rounded integer
+  rainAm: number;        // AM precipitation probability (0-100%)
+  rainPm: number;        // PM precipitation probability (0-100%)
 }
 
 export interface WeatherApiResponse {
