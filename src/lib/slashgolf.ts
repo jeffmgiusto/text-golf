@@ -1040,6 +1040,50 @@ export async function fetchTournamentList(): Promise<Array<{ tournId: string; na
   }
 }
 
+// Get tournament IDs for the 4 major championships
+export async function getMajorTournamentIds(): Promise<{
+  masters: string;
+  pga: string;
+  usopen: string;
+  theopen: string;
+} | null> {
+  const cacheKey = 'major-tournament-ids';
+  const cached = scheduleCache.get(cacheKey);
+  if (cached && Date.now() - cached.cachedAt < HISTORICAL_CACHE_DURATION_MS) {
+    return cached.data as { masters: string; pga: string; usopen: string; theopen: string };
+  }
+
+  try {
+    const tournaments = await fetchTournamentList();
+
+    let masters = '';
+    let pga = '';
+    let usopen = '';
+    let theopen = '';
+
+    for (const t of tournaments) {
+      const name = t.name;
+      if (!masters && /masters/i.test(name) && !/masters\s+champions/i.test(name)) {
+        masters = t.tournId;
+      } else if (!pga && /pga\s+championship/i.test(name)) {
+        pga = t.tournId;
+      } else if (!usopen && /u\.?s\.?\s*open/i.test(name)) {
+        usopen = t.tournId;
+      } else if (!theopen && !usopen.includes(t.tournId) && (/open\s+championship/i.test(name) || /the\s+open/i.test(name) || /british\s+open/i.test(name)) && !/u\.?s\.?\s*open/i.test(name)) {
+        theopen = t.tournId;
+      }
+    }
+
+    if (!masters || !pga || !usopen || !theopen) return null;
+
+    const result = { masters, pga, usopen, theopen };
+    scheduleCache.set(cacheKey, { data: result, cachedAt: Date.now() });
+    return result;
+  } catch {
+    return null;
+  }
+}
+
 // Format score number to string (e.g., -12 -> "-12", 0 -> "E", 5 -> "+5")
 function formatScoreNumber(score: number): string {
   if (score === 0) return 'E';

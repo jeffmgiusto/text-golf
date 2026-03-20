@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { AsciiBox, AsciiRow, AsciiDivider } from '@/components/AsciiBox';
 import { AsciiChart } from '@/components/AsciiChart';
 import { borderTop, borderBottom } from '@/lib/ascii';
@@ -115,6 +116,18 @@ export default function HistoryPage() {
           <span className="text-[var(--text)]">TOURNAMENT HISTORY</span>
         </AsciiRow>
       </AsciiBox>
+
+      {/* Toggle */}
+      <div className="my-4 flex gap-4 text-sm">
+        <Link href="/history"
+          className="px-4 py-1 border transition-colors border-[var(--green)] text-[var(--green)] bg-[var(--bg-highlight)]">
+          TOURNAMENT HISTORY
+        </Link>
+        <Link href="/history/majors"
+          className="px-4 py-1 border transition-colors border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--text)]">
+          MAJORS
+        </Link>
+      </div>
 
       {/* Tournament selector */}
       <div className="my-4">

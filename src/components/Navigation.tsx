@@ -24,7 +24,9 @@ export function Navigation() {
         │<span className="inline-block w-[64ch] overflow-hidden">
           {' '}
           {navItems.map((item, index) => {
-            const isActive = pathname === item.href;
+            const isActive = item.href === '/'
+              ? pathname === '/'
+              : pathname.startsWith(item.href);
             return (
               <span key={item.href}>
                 <Link
