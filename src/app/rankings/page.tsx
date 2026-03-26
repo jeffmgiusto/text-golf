@@ -91,7 +91,7 @@ export default function RankingsPage() {
 
       {/* Rankings table */}
       {!loading && !error && (
-        <div className="text-xs">
+        <div>
           {/* Table header */}
           <div className="text-[var(--border)]">
             {tableBorder(RANKINGS_COLS, 'top')}
@@ -100,7 +100,7 @@ export default function RankingsPage() {
             │{' '}
             <span className="inline-block w-[4ch] text-[var(--text-dim)]">RANK</span>
             {' '}│{' '}
-            <span className="inline-block w-[36ch] text-left text-[var(--text-dim)]">PLAYER</span>
+            <span className="inline-block w-[37ch] text-left text-[var(--text-dim)]">PLAYER</span>
             {' '}│{' '}
             <span className="inline-block w-[15ch] text-right text-[var(--text-dim)]">
               {rankingType === 'owgr' ? 'AVG POINTS' : 'POINTS'}
@@ -119,10 +119,10 @@ export default function RankingsPage() {
                 {String(entry.rank).padStart(4)}
               </span>
               {' '}│{' '}
-              <span className="inline-block w-[36ch] text-left text-[var(--text)]">
-                {entry.playerName.length > 36
-                  ? entry.playerName.substring(0, 35) + '…'
-                  : entry.playerName.padEnd(36)}
+              <span className="inline-block w-[37ch] text-left text-[var(--text)]">
+                {entry.playerName.length > 37
+                  ? entry.playerName.substring(0, 36) + '…'
+                  : entry.playerName.padEnd(37)}
               </span>
               {' '}│{' '}
               <span className="inline-block w-[15ch] text-right text-[var(--green)]">

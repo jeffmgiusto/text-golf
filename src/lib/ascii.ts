@@ -33,5 +33,5 @@ export function tableBorder(
 // Leaderboard columns: POS(6) + PLAYER(31) + SCORE(9) + RD(6) + THRU(8) = 60 dashes + 6 junctions = 66ch
 export const LEADERBOARD_COLS = [6, 31, 9, 6, 8];
 
-// Rankings columns: RANK(6) + PLAYER(38) + POINTS(17) = 61 dashes + 4 junctions = 66ch
-export const RANKINGS_COLS = [6, 38, 17];
+// Rankings columns: RANK(6) + PLAYER(39) + POINTS(17) = 62 dashes + 4 junctions = 66ch
+export const RANKINGS_COLS = [6, 39, 17];

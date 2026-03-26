@@ -135,7 +135,7 @@ export default function HistoryPage() {
           value={selectedTournId}
           onChange={(e) => setSelectedTournId(e.target.value)}
           disabled={loadingTournaments}
-          className="bg-[var(--bg)] text-[var(--green)] border border-[var(--green)] font-mono text-sm px-2 py-1 outline-none cursor-pointer"
+          className="w-full bg-[var(--bg)] text-[var(--green)] border border-[var(--green)] font-mono text-sm px-2 py-1 outline-none cursor-pointer"
         >
           <option value="">
             {loadingTournaments ? 'Loading tournaments...' : '-- Select Tournament --'}

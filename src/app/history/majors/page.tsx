@@ -30,7 +30,7 @@ interface SearchedPlayer {
   results: Record<string, Record<string, { position: string }>>;
 }
 
-const TABLE_COLS = [6, 38, 2];
+const TABLE_COLS = [6, 54, 2];
 
 export default function MajorsPage() {
   const [data, setData] = useState<MajorsPageData | null>(null);
@@ -149,10 +149,10 @@ export default function MajorsPage() {
               }}
               onFocus={() => setShowSuggestions(true)}
               placeholder="Search for a player..."
-              className="w-full max-w-md bg-[var(--bg)] text-[var(--green)] border border-[var(--green)] font-mono text-sm px-3 py-1 outline-none"
+              className="w-full bg-[var(--bg)] text-[var(--green)] border border-[var(--green)] font-mono text-sm px-3 py-1 outline-none"
             />
             {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute z-10 w-full max-w-md bg-[var(--bg)] border border-[var(--green)] mt-[-1px]">
+              <div className="absolute z-10 w-full bg-[var(--bg)] border border-[var(--green)] mt-[-1px]">
                 {suggestions.map(name => (
                   <button
                     key={name}
@@ -184,7 +184,7 @@ export default function MajorsPage() {
           )}
 
           {/* Top 25 table */}
-          <div className="text-xs">
+          <div>
             <div className="text-[var(--border)]">
               {tableBorder(TABLE_COLS, 'top')}
             </div>
@@ -192,7 +192,7 @@ export default function MajorsPage() {
               │{' '}
               <span className="inline-block w-[4ch] text-[var(--text-dim)]">RANK</span>
               {' '}│{' '}
-              <span className="inline-block w-[36ch] text-left text-[var(--text-dim)]">PLAYER</span>
+              <span className="inline-block w-[52ch] text-left text-[var(--text-dim)]">PLAYER</span>
               {' '}│
             </div>
             <div className="text-[var(--border)]">
@@ -210,10 +210,10 @@ export default function MajorsPage() {
                     {String(entry.rank).padStart(4)}
                   </span>
                   {' '}│{' '}
-                  <span className="inline-block w-[36ch] text-left text-[var(--text)]">
-                    {entry.playerName.length > 36
-                      ? entry.playerName.substring(0, 35) + '\u2026'
-                      : entry.playerName.padEnd(36)}
+                  <span className="inline-block w-[52ch] text-left text-[var(--text)]">
+                    {entry.playerName.length > 52
+                      ? entry.playerName.substring(0, 51) + '\u2026'
+                      : entry.playerName.padEnd(52)}
                   </span>
                   {' '}│
                   <span className="text-[var(--text-dim)]">
