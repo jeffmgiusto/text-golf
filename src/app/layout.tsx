@@ -10,8 +10,32 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Text Golf - Live PGA Tour Leaderboard",
-  description: "ASCII-styled live golf leaderboard with tournament data",
+  title: "Text Golf — Terminal-Style PGA Tour Leaderboard",
+  description:
+    "Live PGA Tour scores with a retro ASCII aesthetic. Real-time leaderboards, hole-by-hole scorecards, rankings, and tournament history. No ads, no clutter.",
+  openGraph: {
+    title: "Text Golf — Terminal-Style PGA Tour Leaderboard",
+    description:
+      "Live PGA Tour scores with a retro ASCII aesthetic. No ads, no clutter.",
+    url: "https://textgolf.io",
+    siteName: "Text Golf",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Text Golf - Terminal-style PGA Tour leaderboard showing live scores",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Text Golf — Terminal-Style PGA Tour Leaderboard",
+    description:
+      "Live PGA Tour scores with a retro ASCII aesthetic. No ads, no clutter.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
