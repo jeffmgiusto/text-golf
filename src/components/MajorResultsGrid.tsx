@@ -36,31 +36,39 @@ function tierColor(tier: Tier): string {
 }
 
 const MAJOR_SHORT: Record<string, string> = {
-  masters: 'MAS',
+  masters: 'MASTERS',
   pga: 'PGA',
-  usopen: 'USO',
-  theopen: 'OPN',
+  usopen: 'US OPEN',
+  theopen: 'THE OPEN',
 };
 
 function formatPos(pos: string | undefined): string {
-  if (!pos) return ' - ';
-  if (pos === 'NT') return ' NT';
+  if (!pos) return '-';
+  if (pos === 'NT') return 'NT';
   if (pos === 'CUT' || pos === 'MC') return 'CUT';
-  if (pos === 'WD') return ' WD';
-  if (pos === 'DQ') return ' DQ';
-  return pos.length >= 3 ? pos : pos.padStart(3);
+  if (pos === 'WD') return 'WD';
+  if (pos === 'DQ') return 'DQ';
+  return pos;
+}
+
+function centerPad(str: string, width: number): string {
+  if (str.length >= width) return str.slice(0, width);
+  const total = width - str.length;
+  const left = Math.floor(total / 2);
+  const right = total - left;
+  return ' '.repeat(left) + str + ' '.repeat(right);
 }
 
 export function MajorResultsGrid({ playerName, results, years, majors }: MajorResultsGridProps) {
   const sortedYears = [...years].sort((a, b) => a - b);
 
-  const COL_W = 4;
-  const YEAR_W = 4;
+  const COL_W = 12;
+  const YEAR_W = 8;
 
-  const majorHeaders = majors.map(m => (MAJOR_SHORT[m.key] || m.name.slice(0, 3).toUpperCase()).padStart(COL_W)).join('│');
+  const majorHeaders = majors.map(m => centerPad(MAJOR_SHORT[m.key] || m.name.slice(0, 3).toUpperCase(), COL_W)).join('│');
   const dividerSeg = majors.map(() => '─'.repeat(COL_W)).join('┼');
 
-  const headerLine = `${'YEAR'.padEnd(YEAR_W)}│${majorHeaders}`;
+  const headerLine = `${centerPad('YEAR', YEAR_W)}│${majorHeaders}`;
   const dividerLine = `${'─'.repeat(YEAR_W)}┼${dividerSeg}`;
 
   const yearLines: { line: React.ReactElement; key: number }[] = sortedYears.map(year => {
@@ -68,7 +76,7 @@ export function MajorResultsGrid({ playerName, results, years, majors }: MajorRe
       const pos = results[major.key]?.[String(year)]?.position;
       const tier = getPositionTier(pos);
       const display = formatPos(pos);
-      const padded = display.length < COL_W ? display.padStart(COL_W) : display.slice(0, COL_W);
+      const padded = centerPad(display, COL_W);
       return (
         <span key={major.key}>
           <span style={{ color: 'var(--border)' }}>│</span>
@@ -77,7 +85,7 @@ export function MajorResultsGrid({ playerName, results, years, majors }: MajorRe
       );
     });
 
-    const label = ` '${String(year).slice(-2)}`;
+    const label = centerPad(`'${String(year).slice(-2)}`, YEAR_W);
 
     return {
       key: year,
@@ -91,9 +99,9 @@ export function MajorResultsGrid({ playerName, results, years, majors }: MajorRe
   });
 
   return (
-    <div className="overflow-x-auto py-2 pl-4">
-      <pre className="text-xs leading-relaxed whitespace-pre" style={{ fontFamily: 'inherit' }}>
-        <div className="text-[var(--green)] font-bold mb-1">
+    <div className="overflow-x-auto py-2">
+      <pre className="leading-relaxed whitespace-pre mx-auto w-fit" style={{ fontFamily: 'inherit' }}>
+        <div className="text-[var(--green)] font-bold mb-1 text-center">
           {playerName} — MAJORS
         </div>
         <div>
