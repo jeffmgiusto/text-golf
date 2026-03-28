@@ -127,6 +127,10 @@ export default function HistoryPage() {
           className="px-4 py-1 border transition-colors border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--text)]">
           MAJORS
         </Link>
+        <Link href="/history/player-results"
+          className="px-4 py-1 border transition-colors border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--text)]">
+          PLAYER RESULTS
+        </Link>
       </div>
 
       {/* Tournament selector */}

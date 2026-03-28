@@ -239,3 +239,24 @@ export interface WeatherData {
 export interface WeatherApiResponse {
   weather: WeatherData | null;
 }
+
+// ============================================
+// Player Results Types
+// ============================================
+
+export interface PlayerTournamentResult {
+  tournamentName: string;
+  position: string;       // "1", "T5", "CUT", "WD", "DQ"
+  score: string | null;   // "-12", "E", "+5", or null for CUT/WD/DQ
+}
+
+export interface PlayerResultsData {
+  playerName: string;
+  results: PlayerTournamentResult[];
+}
+
+export interface PlayerResultsResponse {
+  topPlayers: string[];
+  playerResults: Record<string, PlayerResultsData>;
+  fetchedAt: string;
+}
